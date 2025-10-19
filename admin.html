@@ -740,4 +740,87 @@
                     <p><strong>Parish:</strong> ${currentCase.parish}</p>
                     <p><strong>Last Seen:</strong> ${new Date(currentCase.last_seen_date).toLocaleDateString()}</p>
                     <p><strong>Description:</strong> ${currentCase.description}</p>
-                    <p><strong
+                    <p><strong>Reporter:</strong> ${currentCase.reporter_name}</p>
+                    <p><strong>Contact:</strong> ${currentCase.reporter_contact}</p>
+                `;
+
+                document.getElementById('reviewModal').style.display = 'flex';
+            } catch (error) {
+                console.error('Error loading case:', error);
+                alert('Error loading case details');
+            }
+        }
+
+        // Approve case
+        async function approveCase() {
+            if (!currentCase) return;
+
+            try {
+                const response = await fetch(`/api/cases/${currentCase.id}/approve`, {
+                    method: 'PUT'
+                });
+
+                if (response.ok) {
+                    alert('Case approved successfully!');
+                    document.getElementById('reviewModal').style.display = 'none';
+                    loadCases();
+                } else {
+                    alert('Error approving case');
+                }
+            } catch (error) {
+                console.error('Error approving case:', error);
+                alert('Error approving case');
+            }
+        }
+
+        // Reject case
+        async function rejectCase() {
+            if (!currentCase) return;
+
+            const reason = prompt('Please provide a reason for rejection:');
+            if (!reason) return;
+
+            try {
+                const response = await fetch(`/api/cases/${currentCase.id}/reject`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reason })
+                });
+
+                if (response.ok) {
+                    alert('Case rejected');
+                    document.getElementById('reviewModal').style.display = 'none';
+                    loadCases();
+                } else {
+                    alert('Error rejecting case');
+                }
+            } catch (error) {
+                console.error('Error rejecting case:', error);
+                alert('Error rejecting case');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('reviewModal').style.display = 'none';
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCases();
+            loadStats();
+        });
+    </script>
+
+    <!-- Load Supabase SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+    <!-- Load Supabase client configuration -->
+    <script src="supabaseClient.js"></script>
+
+    <!-- Load database utilities -->
+    <script src="dbUtils.js"></script>
+</body>
+</html>

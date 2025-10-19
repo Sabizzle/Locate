@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>loCATE! - Home Dashboard</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
     <style>
         * {
             margin: 0;
@@ -478,20 +479,16 @@
     </header>
 
     <!-- Load Supabase SDK -->
-<script src="https://unpkg.com/@supabase/supabase-js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-<!-- Load your client file (Step 1) -->
-<script src="supabaseClient.js"></script>
+    <!-- Load Supabase client configuration -->
+    <script src="supabaseClient.js"></script>
 
-<!-- Your page-specific code goes here -->
-<script>
-  async function loadCases() {
-    const { data, error } = await supabaseClient.from('cases').select('*');
-    console.log(data, error);
-  }
+    <!-- Load database utilities -->
+    <script src="dbUtils.js"></script>
 
-  loadCases();
-</script>
+    <!-- Load chatbot -->
+    <script src="chatbot.js"></script>
 
 
 
@@ -509,51 +506,51 @@
         </section>
 
         <!-- Dashboard Grid -->
-        <section class="dashboard-grid">
-            <a href="report.html" class="card">
+        <section class="dashboard-grid animate-fade-in-up">
+            <a href="report.html" class="card ripple stagger-1">
                 <div class="card-icon">📢</div>
                 <h3>Report Missing</h3>
                 <p>Submit a new missing person report with photos and details</p>
             </a>
 
-            <a href="missingPersons.html" class="card">
+            <a href="missingPersons.html" class="card ripple stagger-2">
                 <div class="card-icon">👥</div>
                 <h3>View All Missing Persons</h3>
                 <p>Browse and search through active missing person cases</p>
             </a>
 
-            <a href="missingPersons.html" class="card">
+            <a href="missingPersons.html" class="card ripple stagger-3">
                 <div class="card-icon">📍</div>
                 <h3>Filter by Parish</h3>
                 <p>View missing persons by specific Jamaican parish</p>
             </a>
 
-            <a href="submit-tip.html" class="card">
+            <a href="submit-tip.html" class="card ripple stagger-4">
                 <div class="card-icon">💡</div>
                 <h3>Submit a Tip</h3>
                 <p>Share information about a missing person case</p>
             </a>
 
-            <a href="search-parties.html" class="card">
+            <a href="search-parties.html" class="card ripple stagger-5">
                 <div class="card-icon">🔦</div>
                 <h3>Search Parties</h3>
                 <p>View or join organized search party</p>
             </a>
 
-            <a href="about.html" class="card">
+            <a href="about.html" class="card ripple stagger-6">
                 <div class="card-icon">ℹ️</div>
                 <h3>About / Help</h3>
                 <p>Learn about our mission and how to help</p>
             </a>
         </section>
 
-        <!-- Recently Reported Section
+        <!-- Recently Reported Section -->
         <section class="recently-reported">
             <h2 class="section-title">Recently Reported</h2>
             <div class="horizontal-scroll" id="recentlyReported">
-                <!- Dynamically loaded -->
-            <!-- </div>
-        </section> --> 
+                <!-- Dynamically loaded -->
+            </div>
+        </section> 
     </main>
 
     <!-- Footer -->
@@ -596,7 +593,6 @@
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
 
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script>
         // Mobile menu toggle
         function toggleMenu() {
@@ -607,44 +603,41 @@
         // Load recently reported cases
         async function loadRecentCases() {
             try {
-                const response = await fetch('/api/cases?limit=10&sort=recent');
-                const cases = await response.json();
-                
-                const container = document.getElementById('recentlyReported');
-                container.innerHTML = cases.map(c => `
-                    <a href="case-detail.html?id=${c.id}" class="missing-card">
-                        <img src="${c.photo_url || 'placeholder.jpg'}" alt="${c.full_name}">
-                        <div class="missing-card-content">
-                            <h4>${c.full_name}</h4>
-                            <div class="missing-card-info">
-                                <span>📍 ${c.parish}</span>
-                                <span>📅 Last seen: ${new Date(c.last_seen_date).toLocaleDateString()}</span>
-                                <span>👤 Age: ${c.age}</span>
+                const { data: cases, error } = await window.supabaseClient
+                    .from('cases')
+                    .select('*')
+                    .eq('status', 'Active')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                if (cases && cases.length > 0) {
+                    const container = document.getElementById('recentlyReported');
+                    container.innerHTML = cases.map(c => `
+                        <a href="caseDetail.html?id=${c.id}" class="missing-card">
+                            <img src="${c.photo_url || 'https://via.placeholder.com/280x200?text=No+Photo'}" alt="${c.full_name}">
+                            <div class="missing-card-content">
+                                <h4>${c.full_name}</h4>
+                                <div class="missing-card-info">
+                                    <span>📍 ${c.parish}</span>
+                                    <span>📅 Last seen: ${new Date(c.last_seen_date).toLocaleDateString()}</span>
+                                    <span>👤 Age: ${c.age}</span>
+                                </div>
+                                <span class="status-badge status-${c.status.toLowerCase()}">${c.status}</span>
                             </div>
-                            <span class="status-badge status-${c.status.toLowerCase()}">${c.status}</span>
-                        </div>
-                    </a>
-                `).join('');
+                        </a>
+                    `).join('');
+                }
             } catch (error) {
                 console.error('Error loading cases:', error);
             }
         }
 
-        // WebSocket for live alerts
-        let socket;
+        // WebSocket for live alerts (disabled for now)
         function initWebSocket() {
-            socket = io();
-            
-            socket.on('new-report', (data) => {
-                showAlert(data);
-                showToast(`New report: ${data.full_name} in ${data.parish}`);
-            });
-
-            socket.on('case-update', (data) => {
-                if (data.status === 'Found') {
-                    showToast(`Good news! ${data.full_name} has been found!`);
-                }
-            });
+            // Socket.io integration can be added later for real-time updates
+            console.log('WebSocket not configured yet');
         }
 
         // Show alert banner

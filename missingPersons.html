@@ -372,20 +372,13 @@
 <body>
 
     <!-- Load Supabase SDK -->
-<script src="https://unpkg.com/@supabase/supabase-js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-<!-- Load your client file (Step 1) -->
-<script src="supabaseClient.js"></script>
+    <!-- Load Supabase client configuration -->
+    <script src="supabaseClient.js"></script>
 
-<!-- Your page-specific code goes here -->
-<script>
-  async function loadCases() {
-    const { data, error } = await supabaseClient.from('cases').select('*');
-    console.log(data, error);
-  }
-
-  loadCases();
-</script>
+    <!-- Load database utilities -->
+    <script src="dbUtils.js"></script>
 
 
     <!-- Header -->
@@ -540,14 +533,20 @@
             }).addTo(map);
         }
 
-        // Load cases from API
+        // Load cases from Supabase
         async function loadCases() {
             document.getElementById('loading').style.display = 'block';
-            
+
             try {
-                const response = await fetch('/api/cases');
-                allCases = await response.json();
-                
+                const { data: cases, error } = await window.supabaseClient
+                    .from('cases')
+                    .select('*')
+                    .eq('status', 'Active')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                allCases = cases || [];
                 document.getElementById('loading').style.display = 'none';
                 displayCases(allCases);
             } catch (error) {
@@ -574,9 +573,9 @@
             noResults.style.display = 'none';
             
             gridView.innerHTML = cases.map(c => `
-                <a href="case-detail.html?id=${c.id}" class="case-card">
-                    <img src="${c.photo_url || 'https://via.placeholder.com/300x250?text=No+Photo'}" 
-                         alt="${c.full_name}" 
+                <a href="caseDetail.html?id=${c.id}" class="case-card">
+                    <img src="${c.photo_url || 'https://via.placeholder.com/300x250?text=No+Photo'}"
+                         alt="${c.full_name}"
                          class="case-image">
                     <div class="case-content">
                         <h3 class="case-name">${c.full_name}</h3>
@@ -611,7 +610,7 @@
                                 <h4>${c.full_name}</h4>
                                 <p>${c.age} years old</p>
                                 <p>${c.parish}</p>
-                                <a href="case-detail.html?id=${c.id}" class="btn btn-primary">View Details</a>
+                                <a href="caseDetail.html?id=${c.id}" class="btn btn-primary">View Details</a>
                             </div>
                         `);
                     markers.push(marker);

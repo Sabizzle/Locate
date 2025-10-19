@@ -1,0 +1,22 @@
+{
+  "name": "locate-jamaica",
+  "version": "1.0.0",
+  "description": "loCATE! - Missing Persons Tracking System for Jamaica",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "missing-persons",
+    "jamaica",
+    "public-safety",
+    "community"
+  ],
+  "author": "loCATE! Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/locate-jamaica"
+  }
+}

@@ -332,20 +332,13 @@
 <body>
 
     <!-- Load Supabase SDK -->
-<script src="https://unpkg.com/@supabase/supabase-js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-<!-- Load your client file (Step 1) -->
-<script src="supabaseClient.js"></script>
+    <!-- Load Supabase client configuration -->
+    <script src="supabaseClient.js"></script>
 
-<!-- Your page-specific code goes here -->
-<script>
-  async function loadCases() {
-    const { data, error } = await supabaseClient.from('cases').select('*');
-    console.log(data, error);
-  }
-
-  loadCases();
-</script>
+    <!-- Load database utilities -->
+    <script src="dbUtils.js"></script>
 
     <header>
         <div class="header-container">
@@ -635,49 +628,46 @@
         // Handle form submission
         async function handleSubmit(event) {
             event.preventDefault();
-            
+
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
-            
+
             // Gather form data
-            const formData = new FormData();
-            formData.append('fullName', document.getElementById('fullName').value);
-            formData.append('age', document.getElementById('age').value);
-            formData.append('gender', document.getElementById('gender').value);
-            formData.append('photo', document.getElementById('photo').files[0]);
-            formData.append('description', document.getElementById('description').value);
-            formData.append('clothing', document.getElementById('clothing').value);
-            formData.append('lastSeenDate', document.getElementById('lastSeenDate').value);
-            formData.append('lastSeenTime', document.getElementById('lastSeenTime').value);
-            formData.append('parish', document.getElementById('parish').value);
-            formData.append('lastSeenAddress', document.getElementById('lastSeenAddress').value);
-            formData.append('latitude', document.getElementById('latitude').value);
-            formData.append('longitude', document.getElementById('longitude').value);
-            formData.append('relationship', document.getElementById('relationship').value);
-            formData.append('reporterName', document.getElementById('reporterName').value);
-            formData.append('reporterContact', document.getElementById('reporterContact').value);
-            formData.append('reporterEmail', document.getElementById('reporterEmail').value);
-            formData.append('policeReport', document.getElementById('policeReport').value);
-            
+            const caseData = {
+                fullName: document.getElementById('fullName').value,
+                age: document.getElementById('age').value,
+                gender: document.getElementById('gender').value,
+                description: document.getElementById('description').value,
+                clothing: document.getElementById('clothing').value,
+                lastSeenDate: document.getElementById('lastSeenDate').value,
+                lastSeenTime: document.getElementById('lastSeenTime').value,
+                parish: document.getElementById('parish').value,
+                lastSeenAddress: document.getElementById('lastSeenAddress').value,
+                latitude: document.getElementById('latitude').value,
+                longitude: document.getElementById('longitude').value,
+                relationship: document.getElementById('relationship').value,
+                reporterName: document.getElementById('reporterName').value,
+                reporterContact: document.getElementById('reporterContact').value,
+                reporterEmail: document.getElementById('reporterEmail').value,
+                policeReport: document.getElementById('policeReport').value
+            };
+
+            const photoFile = document.getElementById('photo').files[0];
+
             try {
-                const response = await fetch('/api/cases', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
+                const { data, error } = await createCase(caseData, photoFile);
+
+                if (error) {
+                    throw error;
+                }
+
+                if (data) {
                     document.getElementById('successModal').classList.add('show');
-                } else {
-                    alert(data.message || 'Error submitting report');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Submit Report';
                 }
             } catch (error) {
                 console.error('Submission error:', error);
-                alert('An error occurred. Please try again.');
+                alert('An error occurred. Please try again: ' + error.message);
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Report';
             }

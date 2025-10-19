@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find JA - Login</title>
+    <title>loCATE! - Login & Registration</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
         * {
             margin: 0;
@@ -407,38 +408,29 @@
         // Handle login
         async function handleLogin(event) {
             event.preventDefault();
-            
+
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            const rememberMe = document.getElementById('rememberMe').checked;
-            
+
             try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password, rememberMe })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    // Store user data
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    
+                const { data, error } = await loginUser(email, password);
+
+                if (error) {
+                    document.getElementById('loginPasswordError').textContent = error.message || 'Invalid credentials';
+                    document.getElementById('loginPasswordError').classList.add('show');
+                    return;
+                }
+
+                if (data && data.user) {
                     // Show success message
                     const successMsg = document.getElementById('loginSuccess');
                     successMsg.textContent = 'Login successful! Redirecting...';
                     successMsg.classList.add('show');
-                    
+
                     // Redirect to home
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        window.location.href = 'home.html';
                     }, 1500);
-                } else {
-                    document.getElementById('loginPasswordError').textContent = data.message || 'Invalid credentials';
-                    document.getElementById('loginPasswordError').classList.add('show');
                 }
             } catch (error) {
                 console.error('Login error:', error);
@@ -450,10 +442,10 @@
         // Handle register
         async function handleRegister(event) {
             event.preventDefault();
-            
+
             // Clear previous errors
             document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
-            
+
             const fullName = document.getElementById('regFullName').value;
             const email = document.getElementById('regEmail').value;
             const password = document.getElementById('regPassword').value;
@@ -461,47 +453,42 @@
             const parish = document.getElementById('regParish').value;
             const address = document.getElementById('regAddress').value;
             const notifyOptIn = document.getElementById('notifyOptIn').checked;
-            
+
             // Validate password match
             if (password !== confirmPassword) {
                 document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
                 document.getElementById('confirmPasswordError').classList.add('show');
                 return;
             }
-            
+
             // Validate password strength
             if (password.length < 8) {
                 document.getElementById('confirmPasswordError').textContent = 'Password must be at least 8 characters';
                 document.getElementById('confirmPasswordError').classList.add('show');
                 return;
             }
-            
+
             try {
-                const response = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        fullName,
-                        email,
-                        password,
-                        parish,
-                        address,
-                        notifyOptIn
-                    })
+                const { data, error } = await registerUser({
+                    fullName,
+                    email,
+                    password,
+                    parish,
+                    address,
+                    notifyOptIn
                 });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
+
+                if (error) {
+                    document.getElementById('regEmailError').textContent = error.message || 'Registration failed';
+                    document.getElementById('regEmailError').classList.add('show');
+                    return;
+                }
+
+                if (data) {
                     // Show success and switch to login
-                    alert('Registration successful! Please login.');
+                    alert('Registration successful! Please check your email to verify your account, then login.');
                     switchTab('login');
                     document.getElementById('loginEmail').value = email;
-                } else {
-                    document.getElementById('regEmailError').textContent = data.message || 'Registration failed';
-                    document.getElementById('regEmailError').classList.add('show');
                 }
             } catch (error) {
                 console.error('Registration error:', error);
@@ -534,42 +521,24 @@
         }
     </script>
 
-<!-- Load Supabase SDK -->
-<script src="https://unpkg.com/@supabase/supabase-js"></script>
+    <!-- Load Supabase SDK -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-<!-- Load your client file (Step 1) -->
-<script src="supabaseClient.js"></script>
+    <!-- Load Supabase client configuration -->
+    <script src="supabaseClient.js"></script>
 
-<!-- Your page-specific code goes here -->
-<script>
-  async function loadCases() {
-    const { data, error } = await supabaseClient.from('cases').select('*');
-    console.log(data, error);
-  }
+    <!-- Load database utilities -->
+    <script src="dbUtils.js"></script>
 
-  loadCases();
-</script>
-<script src="https://unpkg.com/@supabase/supabase-js"></script>
-<script src="supabaseClient.js"></script>
+    <!-- Load chatbot -->
+    <script src="chatbot.js"></script>
 
-
-<script>
-  async function testConnection() {
-    const { data, error } = await supabaseClient
-      .from('cases') // or any table you created in Supabase
-      .select('*')
-      .limit(1);
-
-    if (error) {
-      console.error("❌ Connection failed:", error);
-      alert("❌ Supabase connection failed. Check console for details.");
-    } else {
-      console.log("✅ Supabase connected:", data);
-      alert("✅ Supabase is connected successfully!");
-    }
-  }
-
-  testConnection();
-</script>
+    <!-- Add animations on load -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.querySelector('.auth-container');
+            container.classList.add('animate-scale-in');
+        });
+    </script>
 </body>
 </html>
