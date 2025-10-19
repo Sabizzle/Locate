@@ -7,11 +7,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="styles.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --primary: #E65C2A;
@@ -63,15 +59,9 @@
             color: var(--white);
         }
 
-        .logo span {
-            color: var(--primary);
-        }
+        .logo span { color: var(--primary); }
 
-        nav {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
+        nav { display: flex; gap: 1.5rem; align-items: center; }
 
         nav a {
             color: var(--white);
@@ -80,9 +70,7 @@
             font-weight: 500;
         }
 
-        nav a:hover {
-            color: var(--primary);
-        }
+        nav a:hover { color: var(--primary); }
 
         .search-bar {
             display: flex;
@@ -101,15 +89,9 @@
             width: 100%;
         }
 
-        .search-bar input::placeholder {
-            color: rgba(255,255,255,0.6);
-        }
+        .search-bar input::placeholder { color: rgba(255,255,255,0.6); }
 
-        .user-actions {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
+        .user-actions { display: flex; gap: 1rem; align-items: center; }
 
         .btn {
             padding: 0.6rem 1.5rem;
@@ -122,10 +104,7 @@
             display: inline-block;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: var(--white);
-        }
+        .btn-primary { background: var(--primary); color: var(--white); }
 
         .btn-primary:hover {
             background: #d54d1e;
@@ -139,10 +118,7 @@
             border: 2px solid var(--white);
         }
 
-        .btn-outline:hover {
-            background: var(--white);
-            color: var(--secondary);
-        }
+        .btn-outline:hover { background: var(--white); color: var(--secondary); }
 
         /* Alert Banner */
         .alert-banner {
@@ -153,28 +129,14 @@
             display: none;
             animation: slideDown 0.5s ease;
         }
-
-        .alert-banner.show {
-            display: block;
-        }
-
+        .alert-banner.show { display: block; }
         @keyframes slideDown {
-            from {
-                transform: translateY(-100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         /* Main Content */
-        main {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
-        }
+        main { max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem; }
 
         .hero {
             background: linear-gradient(135deg, var(--secondary) 0%, #1a3a5c 100%);
@@ -185,16 +147,8 @@
             margin-bottom: 3rem;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
-
-        .hero h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
+        .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .hero p { font-size: 1.2rem; opacity: 0.9; }
 
         /* Dashboard Grid */
         .dashboard-grid {
@@ -218,39 +172,19 @@
             align-items: center;
             text-align: center;
         }
-
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 25px rgba(230, 92, 42, 0.3);
             background: linear-gradient(135deg, var(--primary) 0%, #ff7844 100%);
             color: var(--white);
         }
-
-        .card-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .card p {
-            opacity: 0.8;
-        }
+        .card-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .card h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .card p { opacity: 0.8; }
 
         /* Recently Reported Section */
-        .section-title {
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-            color: var(--secondary);
-        }
-
-        .recently-reported {
-            margin-bottom: 3rem;
-        }
-
+        .section-title { font-size: 2rem; margin-bottom: 1.5rem; color: var(--secondary); }
+        .recently-reported { margin-bottom: 3rem; }
         .horizontal-scroll {
             display: flex;
             gap: 1.5rem;
@@ -258,20 +192,9 @@
             padding-bottom: 1rem;
             scroll-snap-type: x mandatory;
         }
-
-        .horizontal-scroll::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        .horizontal-scroll::-webkit-scrollbar-track {
-            background: var(--gray-200);
-            border-radius: 10px;
-        }
-
-        .horizontal-scroll::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 10px;
-        }
+        .horizontal-scroll::-webkit-scrollbar { height: 8px; }
+        .horizontal-scroll::-webkit-scrollbar-track { background: var(--gray-200); border-radius: 10px; }
+        .horizontal-scroll::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
 
         .missing-card {
             background: var(--white);
@@ -284,170 +207,62 @@
             text-decoration: none;
             color: var(--secondary);
         }
-
-        .missing-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        }
-
-        .missing-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .missing-card-content {
-            padding: 1.5rem;
-        }
-
-        .missing-card h4 {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-        }
-
+        .missing-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+        .missing-card img { width: 100%; height: 200px; object-fit: cover; }
+        .missing-card-content { padding: 1.5rem; }
+        .missing-card h4 { font-size: 1.2rem; margin-bottom: 0.5rem; }
         .missing-card-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-            font-size: 0.9rem;
-            color: var(--gray-600);
+            display: flex; flex-direction: column; gap: 0.3rem;
+            font-size: 0.9rem; color: var(--gray-600);
         }
 
         .status-badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
+            display: inline-block; padding: 0.3rem 0.8rem; border-radius: 15px;
+            font-size: 0.8rem; font-weight: 600; margin-top: 0.5rem;
         }
-
-        .status-active {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-found {
-            background: #d4edda;
-            color: #155724;
-        }
+        .status-active { background: #fff3cd; color: #856404; }
+        .status-found  { background: #d4edda; color: #155724; }
 
         /* Footer */
-        footer {
-            background: var(--secondary);
-            color: var(--white);
-            padding: 2rem 0;
-            margin-top: 4rem;
-        }
-
+        footer { background: var(--secondary); color: var(--white); padding: 2rem 0; margin-top: 4rem; }
         .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
+            max-width: 1200px; margin: 0 auto; padding: 0 1.5rem;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;
         }
-
-        .footer-section h3 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
+        .footer-section h3 { margin-bottom: 1rem; color: var(--primary); }
         .footer-section a {
-            color: var(--white);
-            text-decoration: none;
-            display: block;
-            margin-bottom: 0.5rem;
-            opacity: 0.8;
-            transition: opacity 0.3s;
+            color: var(--white); text-decoration: none; display: block; margin-bottom: 0.5rem;
+            opacity: 0.8; transition: opacity 0.3s;
         }
-
-        .footer-section a:hover {
-            opacity: 1;
-            color: var(--primary);
-        }
-
-        .footer-bottom {
-            text-align: center;
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
+        .footer-section a:hover { opacity: 1; color: var(--primary); }
+        .footer-bottom { text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); }
 
         /* Mobile Menu */
-        .mobile-menu-toggle {
-            display: none;
-            background: transparent;
-            border: none;
-            color: var(--white);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
+        .mobile-menu-toggle { display: none; background: transparent; border: none; color: var(--white); font-size: 1.5rem; cursor: pointer; }
 
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-
-            nav {
-                display: none;
-                flex-direction: column;
-                width: 100%;
-            }
-
-            nav.show {
-                display: flex;
-            }
-
-            .mobile-menu-toggle {
-                display: block;
-            }
-
-            .search-bar {
-                min-width: auto;
-                width: 100%;
-            }
+            .hero h1 { font-size: 2rem; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            nav { display: none; flex-direction: column; width: 100%; }
+            nav.show { display: flex; }
+            .mobile-menu-toggle { display: block; }
+            .search-bar { min-width: auto; width: 100%; }
         }
 
         /* Toast Notification */
         .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: var(--secondary);
-            color: var(--white);
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            display: none;
-            animation: slideUp 0.5s ease;
-            z-index: 2000;
+            position: fixed; bottom: 2rem; right: 2rem; background: var(--secondary); color: var(--white);
+            padding: 1rem 1.5rem; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            display: none; animation: slideUp 0.5s ease; z-index: 2000;
         }
-
-        .toast.show {
-            display: block;
-        }
-
+        .toast.show { display: block; }
         @keyframes slideUp {
-            from {
-                transform: translateY(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
 <body>
-
-
 
     <!-- Header -->
     <header>
@@ -455,14 +270,14 @@
             <a href="index.html" class="logo">
                 🔍 lo<span>CATE!</span>
             </a>
-            
+
             <button class="mobile-menu-toggle" onclick="toggleMenu()">☰</button>
-            
+
             <div class="search-bar">
                 <input type="text" placeholder="Search missing persons..." id="headerSearch">
                 <span>🔍</span>
             </div>
-            
+
             <nav id="mainNav">
                 <a href="home.html">Home</a>
                 <a href="missingPersons.html">View Missing</a>
@@ -470,7 +285,7 @@
                 <a href="search-parties.html">Search Parties</a>
                 <a href="about.html">About</a>
             </nav>
-            
+
             <div class="user-actions">
                 <a href="index.html" class="btn btn-outline">Login</a>
                 <a href="register.html" class="btn btn-primary">Register</a>
@@ -487,10 +302,8 @@
     <!-- Load database utilities -->
     <script src="dbUtils.js"></script>
 
-    <!-- Load chatbot -->
-    <script src="chatbot.js"></script>
-
-
+    <!-- (Removed chatbot.js) -->
+    <!-- Live chat via Tawk.to is included in the footer -->
 
     <!-- Live Alert Banner -->
     <div class="alert-banner" id="alertBanner">
@@ -550,7 +363,7 @@
             <div class="horizontal-scroll" id="recentlyReported">
                 <!-- Dynamically loaded -->
             </div>
-        </section> 
+        </section>
     </main>
 
     <!-- Footer -->
@@ -560,7 +373,7 @@
                 <h3>loCATE!</h3>
                 <p>Helping reunite families across Jamaica</p>
             </div>
-            
+
             <div class="footer-section">
                 <h3>Quick Links</h3>
                 <a href="index.html">Home</a>
@@ -568,7 +381,7 @@
                 <a href="report.html">Report Missing</a>
                 <a href="search-parties.html">Search Parties</a>
             </div>
-            
+
             <div class="footer-section">
                 <h3>Resources</h3>
                 <a href="about.html">About Us</a>
@@ -576,7 +389,7 @@
                 <a href="about.html#guidelines">Guidelines</a>
                 <a href="#">Privacy Policy</a>
             </div>
-            
+
             <div class="footer-section">
                 <h3>Emergency</h3>
                 <p>Police: 119</p>
@@ -584,26 +397,24 @@
                 <p>Emergency: 110</p>
             </div>
         </div>
-        
+
         <div class="footer-bottom">
             <p>&copy; 2025 loCATE. All rights reserved. Together we can make a difference.</p>
         </div>
 
-            
-<!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/65f0ea1f9131ed19d9794554/1hoqh53ee';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
-<!--End of Tawk.to Script-->
-        
+        <!--Start of Tawk.to Script-->
+        <script type="text/javascript">
+        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+        (function(){
+        var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+        s1.async=true;
+        s1.src='https://embed.tawk.to/65f0ea1f9131ed19d9794554/1hoqh53ee';
+        s1.charset='UTF-8';
+        s1.setAttribute('crossorigin','*');
+        s0.parentNode.insertBefore(s1,s0);
+        })();
+        </script>
+        <!--End of Tawk.to Script-->
     </footer>
 
     <!-- Toast Notification -->
@@ -662,10 +473,7 @@ s0.parentNode.insertBefore(s1,s0);
             document.getElementById('alertName').textContent = data.full_name;
             document.getElementById('alertParish').textContent = data.parish;
             banner.classList.add('show');
-            
-            setTimeout(() => {
-                banner.classList.remove('show');
-            }, 10000);
+            setTimeout(() => { banner.classList.remove('show'); }, 10000);
         }
 
         // Show toast notification
@@ -673,10 +481,7 @@ s0.parentNode.insertBefore(s1,s0);
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.add('show');
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 5000);
+            setTimeout(() => { toast.classList.remove('show'); }, 5000);
         }
 
         // Header search
@@ -694,5 +499,4 @@ s0.parentNode.insertBefore(s1,s0);
         });
     </script>
 </body>
-
 </html>
