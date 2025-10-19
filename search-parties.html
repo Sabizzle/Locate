@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>loCATE!</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #E65C2A;
+            --secondary: #0C243C;
+            --white: #FFFFFF;
+            --gray-100: #F5F5F5;
+            --gray-200: #E0E0E0;
+            --gray-600: #757575;
+            --success: #28A745;
+            --danger: #DC3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--gray-100);
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: var(--white);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--primary);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: var(--secondary);
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #d54d1e;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray-600);
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .parties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .party-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .party-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(230, 92, 42, 0.3);
+        }
+
+        .party-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .party-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .party-badge {
+            padding: 0.3rem 1rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-scheduled {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-cancelled {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+
+        .party-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--gray-600);
+        }
+
+        .party-details span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .party-footer {
+            display: flex;
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .create-form {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .create-form.show {
+            display: block;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+
+        label.required::after {
+            content: ' *';
+            color: var(--danger);
+        }
+
+        input, select, textarea {
+            padding: 0.8rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        #partyMap {
+            height: 300px;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .no-parties {
+            text-align: center;
+            padding: 3rem;
+            background: var(--white);
+            border-radius: 15px;
+        }
+
+        .no-parties h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--gray-600);
+        }
+
+        footer {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .parties-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Load Supabase SDK -->
+<script src="https://unpkg.com/@supabase/supabase-js"></script>
+
+<!-- Load your client file (Step 1) -->
+<script src="supabaseClient.js"></script>
+
+<!-- Your page-specific code goes here -->
+<script>
+  async function loadCases() {
+    const { data, error } = await supabaseClient.from('cases').select('*');
+    console.log(data, error);
+  }
+
+  loadCases();
+</script>
+
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                🔍 lo<span>CATE!</span>
+            </a>
+            
+             <nav>
+                <a href="home.html">Home</a>
+                <a href="missingPersons.html">View Missing</a>
+                <a href="report.html">Report</a>
+                <a href="search-parties.html">Search Parties</a>
+                <a href="about.html">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="page-header">
+            <h1>Search Parties</h1>
+            <button class="btn btn-primary" onclick="showCreateForm()">🔦 Create Search Party</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="filterParties('upcoming')">Upcoming</button>
+            <button class="tab" onclick="filterParties('past')">Past</button>
+            <button class="tab" onclick="filterParties('all')">All</button>
+        </div>
+
+        <!-- Create Form -->
+        <div class="create-form" id="createForm">
+            <h2>Create Search Party</h2>
+            
+            <form onsubmit="handleCreateParty(event)">
+                <div class="form-section">
+                    <h2>Search Party Details</h2>
+                    
+                    <div class="form-group">
+                        <label for="caseSelect" class="required">Missing Person Case</label>
+                        <select id="caseSelect" required>
+                            <option value="">Select a case</option>
+                            <!-- Dynamically populated -->
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="partyDate" class="required">Date</label>
+                            <input type="date" id="partyDate" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="partyTime" class="required">Time</label>
+                            <input type="time" id="partyTime" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="partyParish" class="required">Parish</label>
+                            <select id="partyParish" required onchange="updatePartyMap()">
+                                <option value="">Select parish</option>
+                                <option value="Kingston">Kingston</option>
+                                <option value="St. Andrew">St. Andrew</option>
+                                <option value="St. Catherine">St. Catherine</option>
+                                <option value="Clarendon">Clarendon</option>
+                                <option value="Manchester">Manchester</option>
+                                <option value="St. Elizabeth">St. Elizabeth</option>
+                                <option value="Westmoreland">Westmoreland</option>
+                                <option value="Hanover">Hanover</option>
+                                <option value="St. James">St. James</option>
+                                <option value="Trelawny">Trelawny</option>
+                                <option value="St. Ann">St. Ann</option>
+                                <option value="St. Mary">St. Mary</option>
+                                <option value="Portland">Portland</option>
+                                <option value="St. Thomas">St. Thomas</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="meetingPoint" class="required">Meeting Point Address</label>
+                        <input type="text" id="meetingPoint" placeholder="e.g., Half Way Tree Square" required>
+                        <small>Click on map to set exact location</small>
+                        <div id="partyMap"></div>
+                        <input type="hidden" id="partyLat">
+                        <input type="hidden" id="partyLng">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="requiredItems">Required Items</label>
+                        <textarea id="requiredItems" placeholder="e.g., Flashlight, water, comfortable shoes, phone with charged battery"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additionalNotes">Additional Notes</label>
+                        <textarea id="additionalNotes" placeholder="Any additional information volunteers should know"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="organizerContact" class="required">Organizer Contact</label>
+                        <input type="tel" id="organizerContact" placeholder="876-XXX-XXXX" required>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideCreateForm()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Search Party</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Parties List -->
+        <div class="parties-grid" id="partiesGrid">
+            <!-- Dynamically populated -->
+        </div>
+
+        <!-- No Parties -->
+        <div class="no-parties" id="noParties" style="display: none;">
+            <h3>No search parties found</h3>
+            <p>Be the first to organize a search party</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 loCATE!. All rights reserved.</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let map;
+        let marker;
+        let allParties = [];
+        let currentFilter = 'upcoming';
+
+        const parishCoords = {
+            'Kingston': [17.9714, -76.7931],
+            'St. Andrew': [18.0179, -76.7437],
+            'St. Catherine': [18.0054, -77.0269],
+            'Clarendon': [17.9656, -77.2431],
+            'Manchester': [18.0406, -77.5069],
+            'St. Elizabeth': [18.0542, -77.7569],
+            'Westmoreland': [18.2406, -78.1350],
+            'Hanover': [18.4042, -78.1328],
+            'St. James': [18.4698, -77.9183],
+            'Trelawny': [18.3781, -77.5972],
+            'St. Ann': [18.4373, -77.1997],
+            'St. Mary': [18.3686, -76.8564],
+            'Portland': [18.0881, -76.4153],
+            'St. Thomas': [17.9892, -76.3522]
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSearchParties();
+            loadActiveCases();
+            setMinDate();
+            checkCreateFromCase();
+        });
+
+        // Load search parties
+        async function loadSearchParties() {
+            try {
+                const response = await fetch('/api/parties');
+                allParties = await response.json();
+                displayParties(allParties);
+            } catch (error) {
+                console.error('Error loading parties:', error);
+            }
+        }
+
+        // Display parties
+        function displayParties(parties) {
+            const grid = document.getElementById('partiesGrid');
+            const noParties = document.getElementById('noParties');
+
+            // Filter based on current tab
+            let filtered = parties;
+            const now = new Date();
+            
+            if (currentFilter === 'upcoming') {
+                filtered = parties.filter(p => new Date(p.start_time) >= now && p.status === 'Scheduled');
+            } else if (currentFilter === 'past') {
+                filtered = parties.filter(p => new Date(p.start_time) < now || p.status === 'Completed');
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                noParties.style.display = 'block';
+                return;
+            }
+
+            noParties.style.display = 'none';
+
+            grid.innerHTML = filtered.map(p => `
+                <div class="party-card">
+                    <div class="party-header">
+                        <div>
+                            <h3 class="party-title">${p.case_name}</h3>
+                            <span class="party-badge badge-${p.status.toLowerCase()}">${p.status}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="party-details">
+                        <span>📅 ${new Date(p.start_time).toLocaleDateString()}</span>
+                        <span>🕒 ${new Date(p.start_time).toLocaleTimeString()}</span>
+                        <span>📍 ${p.meet_address}, ${p.parish}</span>
+                        <span>👤 Organizer: ${p.organizer_name}</span>
+                        <span>📞 ${p.organizer_contact}</span>
+                        <span>👥 ${p.volunteer_count || 0} volunteers joined</span>
+                    </div>
+
+                    ${p.required_items ? `<p><strong>Required Items:</strong> ${p.required_items}</p>` : ''}
+                    ${p.notes ? `<p><strong>Notes:</strong> ${p.notes}</p>` : ''}
+                    
+                    <div class="party-footer">
+                        ${p.status === 'Scheduled' && new Date(p.start_time) >= now ? 
+                            `<button class="btn btn-primary" onclick="joinParty(${p.id})">Join Search Party</button>` : 
+                            `<button class="btn btn-secondary" disabled>Past Event</button>`
+                        }
+                        <a href="case-detail.html?id=${p.case_id}" class="btn btn-outline">View Case</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter parties
+        function filterParties(filter) {
+            currentFilter = filter;
+            
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            displayParties(allParties);
+        }
+
+        // Show create form
+        function showCreateForm() {
+            document.getElementById('createForm').classList.add('show');
+            document.getElementById('createForm').scrollIntoView({ behavior: 'smooth' });
+            
+            if (!map) {
+                initMap();
+            }
+        }
+
+        // Hide create form
+        function hideCreateForm() {
+            document.getElementById('createForm').classList.remove('show');
+        }
+
+        // Initialize map
+        function initMap() {
+            map = L.map('partyMap').setView([18.1096, -77.2975], 9);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            map.on('click', function(e) {
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+                
+                marker = L.marker(e.latlng).addTo(map);
+                document.getElementById('partyLat').value = e.latlng.lat;
+                document.getElementById('partyLng').value = e.latlng.lng;
+            });
+        }
+
+        // Update map based on parish
+        function updatePartyMap() {
+            const parish = document.getElementById('partyParish').value;
+            
+            if (parish && parishCoords[parish]) {
+                map.setView(parishCoords[parish], 12);
+            }
+        }
+
+        // Load active cases for dropdown
+        async function loadActiveCases() {
+            try {
+                const response = await fetch('/api/cases?status=Active');
+                const cases = await response.json();
+                
+                const select = document.getElementById('caseSelect');
+                select.innerHTML = '<option value="">Select a case</option>' + 
+                    cases.map(c => `<option value="${c.id}">${c.full_name} - ${c.parish}</option>`).join('');
+            } catch (error) {
+                console.error('Error loading cases:', error);
+            }
+        }
+
+        // Set minimum date to today
+        function setMinDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('partyDate').min = today;
+        }
+
+        // Check if creating from case detail page
+        function checkCreateFromCase() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const create = urlParams.get('create');
+            const caseId = urlParams.get('caseId');
+            
+            if (create === 'true' && caseId) {
+                showCreateForm();
+                setTimeout(() => {
+                    document.getElementById('caseSelect').value = caseId;
+                }, 500);
+            }
+        }
+
+        // Handle create party
+        async function handleCreateParty(event) {
+            event.preventDefault();
+            
+            const formData = {
+                case_id: document.getElementById('caseSelect').value,
+                start_time: `${document.getElementById('partyDate').value}T${document.getElementById('partyTime').value}`,
+                parish: document.getElementById('partyParish').value,
+                meet_address: document.getElementById('meetingPoint').value,
+                lat: document.getElementById('partyLat').value,
+                lng: document.getElementById('partyLng').value,
+                required_items: document.getElementById('requiredItems').value,
+                notes: document.getElementById('additionalNotes').value,
+                organizer_contact: document.getElementById('organizerContact').value
+            };
+            
+            try {
+                const response = await fetch('/api/parties', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    alert('Search party created successfully! Volunteers will be notified.');
+                    hideCreateForm();
+                    loadSearchParties();
+                    event.target.reset();
+                } else {
+                    alert('Error creating search party. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error creating search party. Please try again.');
+            }
+        }
+
+        // Join party
+        async function joinParty(partyId) {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!user.id) {
+                alert('Please login to join a search party');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/parties/${partyId}/join`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    alert('You have successfully joined the search party! A confirmation email has been sent.');
+                    loadSearchParties();
+                } else {
+                    alert('Error joining search party. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error joining search party. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>

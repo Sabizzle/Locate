@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>loCATE! - Home Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #E65C2A;
+            --secondary: #0C243C;
+            --white: #FFFFFF;
+            --gray-100: #F5F5F5;
+            --gray-200: #E0E0E0;
+            --gray-600: #757575;
+            --success: #28A745;
+            --danger: #DC3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--gray-100);
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        nav {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--white);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 25px;
+            padding: 0.5rem 1rem;
+            min-width: 250px;
+        }
+
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: var(--white);
+            outline: none;
+            width: 100%;
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #d54d1e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 92, 42, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--white);
+            border: 2px solid var(--white);
+        }
+
+        .btn-outline:hover {
+            background: var(--white);
+            color: var(--secondary);
+        }
+
+        /* Alert Banner */
+        .alert-banner {
+            background: var(--primary);
+            color: var(--white);
+            padding: 1rem;
+            text-align: center;
+            display: none;
+            animation: slideDown 0.5s ease;
+        }
+
+        .alert-banner.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--secondary) 0%, #1a3a5c 100%);
+            color: var(--white);
+            padding: 3rem 2rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(230, 92, 42, 0.3);
+            background: linear-gradient(135deg, var(--primary) 0%, #ff7844 100%);
+            color: var(--white);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            opacity: 0.8;
+        }
+
+        /* Recently Reported Section */
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+        }
+
+        .recently-reported {
+            margin-bottom: 3rem;
+        }
+
+        .horizontal-scroll {
+            display: flex;
+            gap: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+            scroll-snap-type: x mandatory;
+        }
+
+        .horizontal-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .horizontal-scroll::-webkit-scrollbar-track {
+            background: var(--gray-200);
+            border-radius: 10px;
+        }
+
+        .horizontal-scroll::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .missing-card {
+            background: var(--white);
+            border-radius: 15px;
+            min-width: 280px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            scroll-snap-align: start;
+            overflow: hidden;
+            text-decoration: none;
+            color: var(--secondary);
+        }
+
+        .missing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .missing-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .missing-card-content {
+            padding: 1.5rem;
+        }
+
+        .missing-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .missing-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .status-active {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-found {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .footer-section a {
+            color: var(--white);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .footer-section a:hover {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+            }
+
+            nav.show {
+                display: flex;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .search-bar {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--secondary);
+            color: var(--white);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            display: none;
+            animation: slideUp 0.5s ease;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                🔍 lo<span>CATE!</span>
+            </a>
+            
+            <button class="mobile-menu-toggle" onclick="toggleMenu()">☰</button>
+            
+            <div class="search-bar">
+                <input type="text" placeholder="Search missing persons..." id="headerSearch">
+                <span>🔍</span>
+            </div>
+            
+            <nav id="mainNav">
+                <a href="home.html">Home</a>
+                <a href="missingPersons.html">View Missing</a>
+                <a href="report.html">Report</a>
+                <a href="search-parties.html">Search Parties</a>
+                <a href="about.html">About</a>
+            </nav>
+            
+            <div class="user-actions">
+                <a href="index.html" class="btn btn-outline">Login</a>
+                <a href="register.html" class="btn btn-primary">Register</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Load Supabase SDK -->
+<script src="https://unpkg.com/@supabase/supabase-js"></script>
+
+<!-- Load your client file (Step 1) -->
+<script src="supabaseClient.js"></script>
+
+<!-- Your page-specific code goes here -->
+<script>
+  async function loadCases() {
+    const { data, error } = await supabaseClient.from('cases').select('*');
+    console.log(data, error);
+  }
+
+  loadCases();
+</script>
+
+
+
+    <!-- Live Alert Banner -->
+    <div class="alert-banner" id="alertBanner">
+        🚨 New missing person report in your area: <strong id="alertName"></strong> - <span id="alertParish"></span>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Welcome to loCATE!</h1>
+            <p>Helping reunite families and find loved ones across Jamaica</p>
+        </section>
+
+        <!-- Dashboard Grid -->
+        <section class="dashboard-grid">
+            <a href="report.html" class="card">
+                <div class="card-icon">📢</div>
+                <h3>Report Missing</h3>
+                <p>Submit a new missing person report with photos and details</p>
+            </a>
+
+            <a href="missingPersons.html" class="card">
+                <div class="card-icon">👥</div>
+                <h3>View All Missing Persons</h3>
+                <p>Browse and search through active missing person cases</p>
+            </a>
+
+            <a href="missingPersons.html" class="card">
+                <div class="card-icon">📍</div>
+                <h3>Filter by Parish</h3>
+                <p>View missing persons by specific Jamaican parish</p>
+            </a>
+
+            <a href="submit-tip.html" class="card">
+                <div class="card-icon">💡</div>
+                <h3>Submit a Tip</h3>
+                <p>Share information about a missing person case</p>
+            </a>
+
+            <a href="search-parties.html" class="card">
+                <div class="card-icon">🔦</div>
+                <h3>Search Parties</h3>
+                <p>View or join organized search party</p>
+            </a>
+
+            <a href="about.html" class="card">
+                <div class="card-icon">ℹ️</div>
+                <h3>About / Help</h3>
+                <p>Learn about our mission and how to help</p>
+            </a>
+        </section>
+
+        <!-- Recently Reported Section
+        <section class="recently-reported">
+            <h2 class="section-title">Recently Reported</h2>
+            <div class="horizontal-scroll" id="recentlyReported">
+                <!- Dynamically loaded -->
+            <!-- </div>
+        </section> --> 
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>loCATE!</h3>
+                <p>Helping reunite families across Jamaica</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="index.html">Home</a>
+                <a href="missingPersons.html">View Missing Persons</a>
+                <a href="report.html">Report Missing</a>
+                <a href="search-parties.html">Search Parties</a>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <a href="about.html">About Us</a>
+                <a href="about.html#contact">Contact</a>
+                <a href="about.html#guidelines">Guidelines</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Emergency</h3>
+                <p>Police: 119</p>
+                <p>Crime Stop: 311</p>
+                <p>Emergency: 110</p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 loCATE. All rights reserved. Together we can make a difference.</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        // Mobile menu toggle
+        function toggleMenu() {
+            const nav = document.getElementById('mainNav');
+            nav.classList.toggle('show');
+        }
+
+        // Load recently reported cases
+        async function loadRecentCases() {
+            try {
+                const response = await fetch('/api/cases?limit=10&sort=recent');
+                const cases = await response.json();
+                
+                const container = document.getElementById('recentlyReported');
+                container.innerHTML = cases.map(c => `
+                    <a href="case-detail.html?id=${c.id}" class="missing-card">
+                        <img src="${c.photo_url || 'placeholder.jpg'}" alt="${c.full_name}">
+                        <div class="missing-card-content">
+                            <h4>${c.full_name}</h4>
+                            <div class="missing-card-info">
+                                <span>📍 ${c.parish}</span>
+                                <span>📅 Last seen: ${new Date(c.last_seen_date).toLocaleDateString()}</span>
+                                <span>👤 Age: ${c.age}</span>
+                            </div>
+                            <span class="status-badge status-${c.status.toLowerCase()}">${c.status}</span>
+                        </div>
+                    </a>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading cases:', error);
+            }
+        }
+
+        // WebSocket for live alerts
+        let socket;
+        function initWebSocket() {
+            socket = io();
+            
+            socket.on('new-report', (data) => {
+                showAlert(data);
+                showToast(`New report: ${data.full_name} in ${data.parish}`);
+            });
+
+            socket.on('case-update', (data) => {
+                if (data.status === 'Found') {
+                    showToast(`Good news! ${data.full_name} has been found!`);
+                }
+            });
+        }
+
+        // Show alert banner
+        function showAlert(data) {
+            const banner = document.getElementById('alertBanner');
+            document.getElementById('alertName').textContent = data.full_name;
+            document.getElementById('alertParish').textContent = data.parish;
+            banner.classList.add('show');
+            
+            setTimeout(() => {
+                banner.classList.remove('show');
+            }, 10000);
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 5000);
+        }
+
+        // Header search
+        document.getElementById('headerSearch').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = e.target.value;
+                window.location.href = `view-missing.html?q=${encodeURIComponent(query)}`;
+            }
+        });
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadRecentCases();
+            initWebSocket();
+        });
+    </script>
+</body>
+</html>

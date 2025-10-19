@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find JA - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #E65C2A;
+            --secondary: #0C243C;
+            --white: #FFFFFF;
+            --gray-100: #F5F5F5;
+            --gray-200: #E0E0E0;
+            --gray-600: #757575;
+            --success: #28A745;
+            --danger: #DC3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--secondary) 0%, #1a3a5c 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .auth-container {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 450px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #ff7844 100%);
+            color: var(--white);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .auth-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: var(--gray-100);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            color: var(--gray-600);
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            background: var(--white);
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .auth-form {
+            padding: 2rem;
+        }
+
+        .form-tab {
+            display: none;
+        }
+
+        .form-tab.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .password-strength {
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s;
+        }
+
+        .strength-weak { width: 33%; background: var(--danger); }
+        .strength-medium { width: 66%; background: #FFC107; }
+        .strength-strong { width: 100%; background: var(--success); }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-group input {
+            width: auto;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #d54d1e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 92, 42, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--gray-600);
+        }
+
+        .form-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .back-home {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .back-home a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: var(--success);
+            color: var(--white);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @media (max-width: 500px) {
+            .auth-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .auth-form {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+
+
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="logo">🔍</div>
+            <h1>loCATE!</h1>
+            <p>Helping reunite families</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="switchTab('login')">Login</button>
+            <button class="auth-tab" onclick="switchTab('register')">Register</button>
+        </div>
+
+        <div class="auth-form">
+            <!-- Login Form -->
+            <div id="loginForm" class="form-tab active">
+                <div class="success-message" id="loginSuccess"></div>
+                
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" required>
+                        <div class="error-message" id="loginEmailError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required>
+                        <div class="error-message" id="loginPasswordError"></div>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="rememberMe">
+                        <label for="rememberMe">Remember me</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Login</button>
+
+                    <div class="form-footer">
+                        <a href="#" onclick="showForgotPassword()">Forgot password?</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="form-tab">
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label for="regFullName">Full Name</label>
+                        <input type="text" id="regFullName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regEmail">Email Address</label>
+                        <input type="email" id="regEmail" required>
+                        <div class="error-message" id="regEmailError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regPassword">Password</label>
+                        <input type="password" id="regPassword" required oninput="checkPasswordStrength()">
+                        <div class="password-strength">
+                            <div class="password-strength-bar" id="strengthBar"></div>
+                        </div>
+                        <small id="strengthText"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regConfirmPassword">Confirm Password</label>
+                        <input type="password" id="regConfirmPassword" required>
+                        <div class="error-message" id="confirmPasswordError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regParish">Parish</label>
+                        <select id="regParish" required>
+                          <option value="">Select your parish</option>
+                            <option value="Kingston">Kingston</option>
+                            <option value="St. Andrew">St. Andrew</option>
+                            <option value="St. Catherine">St. Catherine</option>
+                            <option value="Clarendon">Clarendon</option>
+                            <option value="Manchester">Manchester</option>
+                            <option value="St. Elizabeth">St. Elizabeth</option>
+                            <option value="Westmoreland">Westmoreland</option>
+                            <option value="Hanover">Hanover</option>
+                            <option value="St. James">St. James</option>
+                            <option value="Trelawny">Trelawny</option>
+                            <option value="St. Ann">St. Ann</option>
+                            <option value="St. Mary">St. Mary</option>
+                            <option value="Portland">Portland</option>
+                            <option value="St. Thomas">St. Thomas</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regAddress">Street Address</label>
+                        <input type="text" id="regAddress" required placeholder="Enter your street address">
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="notifyOptIn" checked>
+                        <label for="notifyOptIn">Receive alerts for missing persons in my area</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create Account</button>
+
+                    <div class="form-footer">
+                        Already have an account? <a href="#" onclick="switchTab('login')">Login</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="back-home">
+        <a href="home.html">← Back to Home</a>
+    </div>
+
+    <script>
+        // Switch between login and register tabs
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.auth-tab');
+            const forms = document.querySelectorAll('.form-tab');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            forms.forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'login') {
+                tabs[0].classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                tabs[1].classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+
+        // Password strength checker
+        function checkPasswordStrength() {
+            const password = document.getElementById('regPassword').value;
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
+            
+            let strength = 0;
+            
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+            
+            strengthBar.className = 'password-strength-bar';
+            
+            if (strength <= 1) {
+                strengthBar.classList.add('strength-weak');
+                strengthText.textContent = 'Weak password';
+                strengthText.style.color = '#DC3545';
+            } else if (strength <= 3) {
+                strengthBar.classList.add('strength-medium');
+                strengthText.textContent = 'Medium password';
+                strengthText.style.color = '#FFC107';
+            } else {
+                strengthBar.classList.add('strength-strong');
+                strengthText.textContent = 'Strong password';
+                strengthText.style.color = '#28A745';
+            }
+        }
+
+        // Handle login
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password, rememberMe })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store user data
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Show success message
+                    const successMsg = document.getElementById('loginSuccess');
+                    successMsg.textContent = 'Login successful! Redirecting...';
+                    successMsg.classList.add('show');
+                    
+                    // Redirect to home
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                } else {
+                    document.getElementById('loginPasswordError').textContent = data.message || 'Invalid credentials';
+                    document.getElementById('loginPasswordError').classList.add('show');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('loginPasswordError').textContent = 'An error occurred. Please try again.';
+                document.getElementById('loginPasswordError').classList.add('show');
+            }
+        }
+
+        // Handle register
+        async function handleRegister(event) {
+            event.preventDefault();
+            
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
+            
+            const fullName = document.getElementById('regFullName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const parish = document.getElementById('regParish').value;
+            const address = document.getElementById('regAddress').value;
+            const notifyOptIn = document.getElementById('notifyOptIn').checked;
+            
+            // Validate password match
+            if (password !== confirmPassword) {
+                document.getElementById('confirmPasswordError').textContent = 'Passwords do not match';
+                document.getElementById('confirmPasswordError').classList.add('show');
+                return;
+            }
+            
+            // Validate password strength
+            if (password.length < 8) {
+                document.getElementById('confirmPasswordError').textContent = 'Password must be at least 8 characters';
+                document.getElementById('confirmPasswordError').classList.add('show');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fullName,
+                        email,
+                        password,
+                        parish,
+                        address,
+                        notifyOptIn
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Show success and switch to login
+                    alert('Registration successful! Please login.');
+                    switchTab('login');
+                    document.getElementById('loginEmail').value = email;
+                } else {
+                    document.getElementById('regEmailError').textContent = data.message || 'Registration failed';
+                    document.getElementById('regEmailError').classList.add('show');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                document.getElementById('regEmailError').textContent = 'An error occurred. Please try again.';
+                document.getElementById('regEmailError').classList.add('show');
+            }
+        }
+
+        // Show forgot password
+        function showForgotPassword() {
+            const email = prompt('Enter your email address to receive a password reset link:');
+            
+            if (email) {
+                fetch('/api/auth/forgot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('If an account exists with that email, a password reset link has been sent.');
+                })
+                .catch(error => {
+                    console.error('Forgot password error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            }
+        }
+    </script>
+
+<!-- Load Supabase SDK -->
+<script src="https://unpkg.com/@supabase/supabase-js"></script>
+
+<!-- Load your client file (Step 1) -->
+<script src="supabaseClient.js"></script>
+
+<!-- Your page-specific code goes here -->
+<script>
+  async function loadCases() {
+    const { data, error } = await supabaseClient.from('cases').select('*');
+    console.log(data, error);
+  }
+
+  loadCases();
+</script>
+<script src="https://unpkg.com/@supabase/supabase-js"></script>
+<script src="supabaseClient.js"></script>
+
+
+<script>
+  async function testConnection() {
+    const { data, error } = await supabaseClient
+      .from('cases') // or any table you created in Supabase
+      .select('*')
+      .limit(1);
+
+    if (error) {
+      console.error("❌ Connection failed:", error);
+      alert("❌ Supabase connection failed. Check console for details.");
+    } else {
+      console.log("✅ Supabase connected:", data);
+      alert("✅ Supabase is connected successfully!");
+    }
+  }
+
+  testConnection();
+</script>
+</body>
+</html>

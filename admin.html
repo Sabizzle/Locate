@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>loCTATE! </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #E65C2A;
+            --secondary: #0C243C;
+            --white: #FFFFFF;
+            --gray-100: #F5F5F5;
+            --gray-200: #E0E0E0;
+            --gray-600: #757575;
+            --success: #28A745;
+            --danger: #DC3545;
+            --warning: #FFC107;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--gray-100);
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        .user-badge {
+            background: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+
+        .sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar a {
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--secondary);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .page-header {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        /* Tables */
+        .content-section {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .content-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray-600);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--gray-100);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        tbody tr:hover {
+            background: var(--gray-100);
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-active {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-verified {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-closed {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            margin: 0 0.2rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--secondary);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--gray-600);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar select,
+        .filter-bar input {
+            padding: 0.6rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+        }
+
+        @media (max-width: 968px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 0.7rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Load Supabase SDK -->
+<script src="https://unpkg.com/@supabase/supabase-js"></script>
+
+<!-- Load your client file (Step 1) -->
+<script src="supabaseClient.js"></script>
+
+<!-- Your page-specific code goes here -->
+<script>
+  async function loadCases() {
+    const { data, error } = await supabaseClient.from('cases').select('*');
+    console.log(data, error);
+  }
+
+  loadCases();
+</script>
+
+
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                🔍 lo<span>LATE!</span> <span style="font-size: 0.7rem; margin-left: 0.5rem;">ADMIN</span>
+            </a>
+            
+            <div class="user-badge">
+                <span id="adminName">Admin User</span> | <a href="index.html" style="color: white;">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h3>Admin Panel</h3>
+            <nav>
+                <a href="#" class="active" data-view="dashboard">📊 Dashboard</a>
+                <a href="#" data-view="pending">⏳ Pending Review</a>
+                <a href="#" data-view="cases">📋 All Cases</a>
+                <a href="#" data-view="tips">💡 Tips</a>
+                <a href="#" data-view="users">👥 Users</a>
+                <a href="#" data-view="parties">🔦 Search Parties</a>
+                <a href="#" data-view="settings">⚙️ Settings</a>
+                <a href="#" data-view="audit">📜 Audit Log</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>Admin Dashboard</h1>
+                <p>Manage missing person reports, review tips, and moderate content</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-value" id="pendingCount">0</div>
+                    <div class="stat-label">Pending Review</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🔴</div>
+                    <div class="stat-value" id="activeCount">0</div>
+                    <div class="stat-label">Active Cases</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value" id="foundCount">0</div>
+                    <div class="stat-label">Found This Month</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-value" id="userCount">0</div>
+                    <div class="stat-label">Registered Users</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">💡</div>
+                    <div class="stat-value" id="tipCount">0</div>
+                    <div class="stat-label">Tips Received</div>
+                </div>
+            </div>
+
+            <!-- Pending Review Section -->
+            <div class="content-section">
+                <h2>Pending Review</h2>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="pending-reports">Reports</button>
+                    <button class="tab-btn" data-tab="pending-tips">Tips</button>
+                </div>
+
+                <div class="filter-bar">
+                    <select id="parishFilter">
+                        <option value="">All Parishes</option>
+                        <option value="Kingston">Kingston</option>
+                        <option value="St. Andrew">St. Andrew</option>
+                        <!-- Add all parishes -->
+                    </select>
+                    <input type="date" id="dateFilter" placeholder="Filter by date">
+                    <button class="btn btn-primary" onclick="applyFilters()">Apply</button>
+                </div>
+
+                <!-- Pending Reports Table -->
+                <div id="pending-reports-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Parish</th>
+                                <th>Reported</th>
+                                <th>Reporter</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingReportsTable">
+                            <!-- Dynamically loaded -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pending Tips Table -->
+                <div id="pending-tips-content" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Case</th>
+                                <th>Submitted By</th>
+                                <th>Date</th>
+                                <th>Preview</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingTipsTable">
+                            <!-- Dynamically loaded -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="content-section">
+                <h2>Recent Activity</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Action</th>
+                            <th>User</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityLog">
+                        <!-- Dynamically loaded -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- User Management Section -->
+            <div class="content-section" id="userManagement" style="display: none;">
+                <h2>User Management</h2>
+                
+                <div class="filter-bar">
+                    <select id="roleFilter">
+                        <option value="">All Roles</option>
+                        <option value="user">User</option>
+                        <option value="moderator">Moderator</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <input type="text" id="userSearch" placeholder="Search users...">
+                    <button class="btn btn-primary" onclick="searchUsers()">Search</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Parish</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTable">
+                        <!-- Dynamically loaded -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="content-section" id="settingsSection" style="display: none;">
+                <h2>System Settings</h2>
+                
+                <div class="form-group">
+                    <label>Search Party Interest Threshold</label>
+                    <input type="number" id="interestThreshold" value="15">
+                    <small>Minimum volunteers needed to suggest search party</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Search Party Time Threshold (hours)</label>
+                    <input type="number" id="timeThreshold" value="48">
+                    <small>Minimum hours before suggesting search party</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Alert Radius (parishes)</label>
+                    <select id="alertRadius">
+                        <option value="same">Same parish only</option>
+                        <option value="adjacent" selected>Same + adjacent parishes</option>
+                        <option value="all">All parishes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Notifications</label>
+                    <input type="checkbox" id="emailEnabled" checked> Enable email notifications
+                </div>
+
+                <button class="btn btn-success" onclick="saveSettings()">Save Settings</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="modal" id="reviewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Review Case</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+
+            <div id="modalBody">
+                <!-- Case details loaded here -->
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="btn btn-success" onclick="approveCase()">✓ Approve</button>
+                <button class="btn btn-danger" onclick="rejectCase()">✗ Reject</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCase = null;
+
+        // Load dashboard data
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            loadPendingReports();
+            loadActivityLog();
+            checkAdminAccess();
+        });
+
+        // Check admin access
+        function checkAdminAccess() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!user.role || !['admin', 'moderator'].includes(user.role)) {
+                alert('Access denied. Admin or moderator privileges required.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            document.getElementById('adminName').textContent = user.name;
+        }
+
+        // Load stats
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/admin/stats');
+                const stats = await response.json();
+                
+                document.getElementById('pendingCount').textContent = stats.pending || 0;
+                document.getElementById('activeCount').textContent = stats.active || 0;
+                document.getElementById('foundCount').textContent = stats.foundThisMonth || 0;
+                document.getElementById('userCount').textContent = stats.users || 0;
+                document.getElementById('tipCount').textContent = stats.tips || 0;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load pending reports
+        async function loadPendingReports() {
+            try {
+                const response = await fetch('/api/mod/pending');
+                const cases = await response.json();
+                
+                const tbody = document.getElementById('pendingReportsTable');
+                tbody.innerHTML = cases.map(c => `
+                    <tr>
+                        <td>${c.id}</td>
+                        <td>${c.full_name}</td>
+                        <td>${c.parish}</td>
+                        <td>${new Date(c.created_at).toLocaleDateString()}</td>
+                        <td>${c.reporter_name}</td>
+                        <td><span class="status-badge status-pending">Pending</span></td>
+                        <td>
+                            <button class="btn btn-primary" onclick="viewCase(${c.id})">Review</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading pending reports:', error);
+            }
+        }
+
+        // Load activity log
+        async function loadActivityLog() {
+            try {
+                const response = await fetch('/api/admin/activity');
+                const logs = await response.json();
+                
+                const tbody = document.getElementById('activityLog');
+                tbody.innerHTML = logs.slice(0, 10).map(log => `
+                    <tr>
+                        <td>${new Date(log.created_at).toLocaleTimeString()}</td>
+                        <td>${log.action}</td>
+                        <td>${log.user_name}</td>
+                        <td>${log.details}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading activity log:', error);
+            }
+        }
+
+        // View case for review
+        async function viewCase(caseId) {
+            try {
+                const response = await fetch(`/api/cases/${caseId}`);
+                currentCase = await response.json();
+                
+                document.getElementById('modalBody').innerHTML = `
+                    <img src="${currentCase.photo_url}" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
+                    <h3>${currentCase.full_name}</h3>
+                    <p><strong>Age:</strong> ${currentCase.age}</p>
+                    <p><strong>Parish:</strong> ${currentCase.parish}</p>
+                    <p><strong>Last Seen:</strong> ${new Date(currentCase.last_seen_date).toLocaleDateString()}</p>
+                    <p><strong>Description:</strong> ${currentCase.description}</p>
+                    <p><strong

@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find JA - Case Details</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #E65C2A;
+            --secondary: #0C243C;
+            --white: #FFFFFF;
+            --gray-100: #F5F5F5;
+            --gray-200: #E0E0E0;
+            --gray-600: #757575;
+            --success: #28A745;
+            --danger: #DC3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--gray-100);
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: var(--white);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .case-header {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .case-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .case-title h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-found {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .case-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            font-size: 1.1rem;
+            color: var(--gray-600);
+        }
+
+        .case-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .case-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .case-image-section {
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+
+        .case-image {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-bottom: 1rem;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #d54d1e;
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .interest-section {
+            background: var(--gray-100);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .interest-count {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .case-details-section {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+
+        .detail-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-value {
+            font-size: 1.1rem;
+            color: var(--secondary);
+        }
+
+        #caseMap {
+            height: 300px;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .timeline {
+            margin-top: 1rem;
+        }
+
+        .timeline-item {
+            padding: 1rem;
+            border-left: 3px solid var(--primary);
+            margin-left: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 1rem;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+
+        .timeline-date {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .tip-form {
+            background: var(--gray-100);
+            padding: 2rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .tip-form h3 {
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .share-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .volunteers-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .volunteer-item {
+            padding: 0.8rem;
+            background: var(--white);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-party-suggestion {
+            background: linear-gradient(135deg, var(--primary) 0%, #ff7844 100%);
+            color: var(--white);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .search-party-suggestion h2 {
+            margin-bottom: 1rem;
+        }
+
+        footer {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .case-content {
+                grid-template-columns: 1fr;
+            }
+
+            .case-title h1 {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Load Supabase SDK -->
+<script src="https://unpkg.com/@supabase/supabase-js"></script>
+
+<!-- Load your client file (Step 1) -->
+<script src="supabaseClient.js"></script>
+
+<!-- Your page-specific code goes here -->
+<script>
+  async function loadCases() {
+    const { data, error } = await supabaseClient.from('cases').select('*');
+    console.log(data, error);
+  }
+
+  loadCases();
+</script>
+
+
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                🔍 Find<span>JA</span>
+            </a>
+            
+            <nav id="mainNav">
+                <a href="home.html">Home</a>
+                <a href="missingPersons.html">View Missing</a>
+                <a href="report.html">Report</a>
+                <a href="search-parties.html">Search Parties</a>
+                <a href="about.html">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Search Party Suggestion (conditionally shown) -->
+        <div class="search-party-suggestion" id="searchPartySuggestion" style="display: none;">
+            <h2>🔦 Create a Search Party</h2>
+            <p>This case has reached 15 volunteers and has been active for 48+ hours. Would you like to organize a search party?</p>
+            <button class="btn btn-secondary" onclick="createSearchParty()">Create Search Party</button>
+        </div>
+
+        <!-- Case Header -->
+        <div class="case-header">
+            <div class="case-header-top">
+                <div class="case-title">
+                    <h1 id="caseName">Loading...</h1>
+                    <span class="status-badge status-active" id="caseStatus">Active</span>
+                </div>
+                <button class="btn btn-outline" onclick="downloadFlyer()">📄 Download Flyer</button>
+            </div>
+            
+            <div class="case-meta">
+                <span>👤 <span id="caseAge"></span> years old</span>
+                <span>📍 <span id="caseParish"></span></span>
+                <span>📅 Last seen: <span id="lastSeenDate"></span></span>
+                <span>🕒 Reported: <span id="reportedDate"></span></span>
+            </div>
+        </div>
+
+        <!-- Case Content -->
+        <div class="case-content">
+            <!-- Image Section -->
+            <div class="case-image-section">
+                <img id="caseImage" src="" alt="Missing person" class="case-image">
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="showTipForm()">💡 Submit Tip</button>
+                    <button class="btn btn-secondary" id="helpBtn" onclick="toggleInterest()">❤️ I Want to Help</button>
+                </div>
+
+                <div class="interest-section">
+                    <div class="interest-count" id="interestCount">0</div>
+                    <p>People want to help</p>
+                    <div class="volunteers-list" id="volunteersList"></div>
+                </div>
+
+                <div class="share-buttons">
+                    <button class="share-btn btn-secondary" onclick="shareCase('facebook')">Share on Facebook</button>
+                    <button class="share-btn btn-secondary" onclick="shareCase('twitter')">Share on Twitter</button>
+                    <button class="share-btn btn-secondary" onclick="copyLink()">📋 Copy Link</button>
+                </div>
+            </div>
+
+            <!-- Details Section -->
+            <div class="case-details-section">
+                <!-- Personal Details -->
+                <div class="detail-section">
+                    <h2>Personal Details</h2>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Full Name</span>
+                            <span class="detail-value" id="fullName"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Age</span>
+                            <span class="detail-value" id="age"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Gender</span>
+                            <span class="detail-value" id="gender"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Physical Description -->
+                <div class="detail-section">
+                    <h2>Physical Description</h2>
+                    <p id="description"></p>
+                </div>
+
+                <!-- Last Known Clothing -->
+                <div class="detail-section">
+                    <h2>Last Known Clothing</h2>
+                    <p id="clothing"></p>
+                </div>
+
+                <!-- Last Seen Location -->
+                <div class="detail-section">
+                    <h2>Last Seen Location</h2>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Address</span>
+                            <span class="detail-value" id="lastSeenAddress"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Parish</span>
+                            <span class="detail-value" id="parish"></span>
+                        </div>
+                    </div>
+                    <div id="caseMap"></div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="detail-section">
+                    <h2>Contact Information</h2>
+                    <p>If you have any information, please contact:</p>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Reporter</span>
+                            <span class="detail-value" id="reporterName"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Phone</span>
+                            <span class="detail-value" id="reporterContact"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Police Report #</span>
+                            <span class="detail-value" id="policeReport"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="detail-section">
+                    <h2>Timeline & Updates</h2>
+                    <div class="timeline" id="timeline"></div>
+                </div>
+
+                <!-- Submit Tip Form -->
+                <div class="tip-form" id="tipForm" style="display: none;">
+                    <h3>Submit a Tip</h3>
+                    <form onsubmit="submitTip(event)">
+                        <div class="form-group">
+                            <label>Your Name (Optional)</label>
+                            <input type="text" id="tipperName" placeholder="Anonymous">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact (Optional)</label>
+                            <input type="text" id="tipperContact" placeholder="Phone or email">
+                        </div>
+                        <div class="form-group">
+                            <label>Information (Required)</label>
+                            <textarea id="tipMessage" required placeholder="Please share any information that might help..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Attach File (Optional)</label>
+                            <input type="file" id="tipFile">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Tip</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideTipForm()">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 loCATE!. All rights reserved.</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let caseData = null;
+        let map = null;
+        let hasExpressedInterest = false;
+
+        // Get case ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const caseId = urlParams.get('id');
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            if (caseId) {
+                loadCaseDetails(caseId);
+            } else {
+                alert('Case ID not provided');
+                window.location.href = 'view-missing.html';
+            }
+        });
+
+        // Load case details
+        async function loadCaseDetails(id) {
+            try {
+                const response = await fetch(`/api/cases/${id}`);
+                caseData = await response.json();
+                
+                displayCaseDetails(caseData);
+                initMap(caseData.lat, caseData.lng);
+                loadInterests(id);
+                checkSearchPartySuggestion(caseData);
+            } catch (error) {
+                console.error('Error loading case:', error);
+                alert('Error loading case details');
+            }
+        }
+
+        // Display case details
+        function displayCaseDetails(data) {
+            document.getElementById('caseName').textContent = data.full_name;
+            document.getElementById('caseStatus').textContent = data.status;
+            document.getElementById('caseStatus').className = `status-badge status-${data.status.toLowerCase()}`;
+            document.getElementById('caseAge').textContent = data.age;
+            document.getElementById('caseParish').textContent = data.parish;
+            document.getElementById('lastSeenDate').textContent = new Date(data.last_seen_date).toLocaleDateString();
+            document.getElementById('reportedDate').textContent = new Date(data.created_at).toLocaleDateString();
+            document.getElementById('caseImage').src = data.photo_url || 'https://via.placeholder.com/400x500?text=No+Photo';
+            document.getElementById('fullName').textContent = data.full_name;
+            document.getElementById('age').textContent = data.age;
+            document.getElementById('gender').textContent = data.gender;
+            document.getElementById('description').textContent = data.description || 'No description provided';
+            document.getElementById('clothing').textContent = data.clothing || 'Not specified';
+            document.getElementById('lastSeenAddress').textContent = data.last_seen_address;
+            document.getElementById('parish').textContent = data.parish;
+            document.getElementById('reporterName').textContent = data.reporter_name;
+            document.getElementById('reporterContact').textContent = data.reporter_contact;
+            document.getElementById('policeReport').textContent = data.police_report_no || 'Not filed';
+            
+            // Timeline
+            displayTimeline(data);
+        }
+
+        // Display timeline
+        function displayTimeline(data) {
+            const timeline = document.getElementById('timeline');
+            let timelineHTML = `
+                <div class="timeline-item">
+                    <div class="timeline-date">${new Date(data.created_at).toLocaleString()}</div>
+                    <p>Report filed for ${data.full_name}</p>
+                </div>
+            `;
+            
+            if (data.verified) {
+                timelineHTML += `
+                    <div class="timeline-item">
+                        <div class="timeline-date">${new Date(data.verified_at).toLocaleString()}</div>
+                        <p>Report verified by moderator</p>
+                    </div>
+                `;
+            }
+            
+            timeline.innerHTML = timelineHTML;
+        }
+
+        // Initialize map
+        function initMap(lat, lng) {
+            if (!lat || !lng) return;
+            
+            map = L.map('caseMap').setView([lat, lng], 13);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup('Last seen here')
+                .openPopup();
+        }
+
+        // Load interests/volunteers
+        async function loadInterests(id) {
+            try {
+                const response = await fetch(`/api/cases/${id}/interests`);
+                const interests = await response.json();
+                
+                document.getElementById('interestCount').textContent = interests.length;
+                
+                const volunteersList = document.getElementById('volunteersList');
+                volunteersList.innerHTML = interests.map(v => `
+                    <div class="volunteer-item">
+                        <span>${v.name}</span>
+                        <span>${v.parish}</span>
+                    </div>
+                `).join('');
+                
+                // Check if current user has expressed interest
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                hasExpressedInterest = interests.some(v => v.user_id === user.id);
+                
+                if (hasExpressedInterest) {
+                    document.getElementById('helpBtn').textContent = '✓ Helping';
+                    document.getElementById('helpBtn').classList.add('btn-outline');
+                }
+            } catch (error) {
+                console.error('Error loading interests:', error);
+            }
+        }
+
+        // Toggle interest
+        async function toggleInterest() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!user.id) {
+                alert('Please login to express interest');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            try {
+                if (hasExpressedInterest) {
+                    await fetch(`/api/cases/${caseId}/interest`, {
+                        method: 'DELETE'
+                    });
+                    hasExpressedInterest = false;
+                    document.getElementById('helpBtn').textContent = '❤️ I Want to Help';
+                } else {
+                    await fetch(`/api/cases/${caseId}/interest`, {
+                        method: 'POST'
+                    });
+                    hasExpressedInterest = true;
+                    document.getElementById('helpBtn').textContent = '✓ Helping';
+                }
+                
+                loadInterests(caseId);
+            } catch (error) {
+                console.error('Error toggling interest:', error);
+            }
+        }
+
+        // Show tip form
+        function showTipForm() {
+            document.getElementById('tipForm').style.display = 'block';
+            document.getElementById('tipForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Hide tip form
+        function hideTipForm() {
+            document.getElementById('tipForm').style.display = 'none';
+        }
+
+        // Submit tip
+        async function submitTip(event) {
+            event.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('tipper_name', document.getElementById('tipperName').value || 'Anonymous');
+            formData.append('tipper_contact', document.getElementById('tipperContact').value);
+            formData.append('message', document.getElementById('tipMessage').value);
+            
+            const file = document.getElementById('tipFile').files[0];
+            if (file) {
+                formData.append('file', file);
+            }
+            
+            try {
+                const response = await fetch(`/api/cases/${caseId}/tips`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    alert('Thank you! Your tip has been submitted.');
+                    hideTipForm();
+                    document.getElementById('tipMessage').value = '';
+                } else {
+                    alert('Error submitting tip. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error submitting tip:', error);
+                alert('Error submitting tip. Please try again.');
+            }
+        }
+
+        // Check if search party should be suggested
+        function checkSearchPartySuggestion(data) {
+            // Logic: interests >= 15, case age >= 48h, status = Active, no existing party
+            const caseAge = Date.now() - new Date(data.created_at).getTime();
+            const hoursAge = caseAge / (1000 * 60 * 60);
+            
+            if (data.interest_count >= 15 && hoursAge >= 48 && data.status === 'Active' && !data.has_search_party) {
+                document.getElementById('searchPartySuggestion').style.display = 'block';
+            }
+        }
+
+        // Create search party
+        function createSearchParty() {
+            window.location.href = `search-parties.html?create=true&caseId=${caseId}`;
+        }
+
+        // Download flyer
+        async function downloadFlyer() {
+            try {
+                const response = await fetch(`/api/cases/${caseId}/flyer`);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `missing-person-${caseId}.pdf`;
+                a.click();
+            } catch (error) {
+                console.error('Error downloading flyer:', error);
+                alert('Error downloading flyer');
+            }
+        }
+
+        // Share case
+        function shareCase(platform) {
+            const url = window.location.href;
+            const text = `Help find ${caseData.full_name}!`;
+            
+            if (platform === 'facebook') {
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+            } else if (platform === 'twitter') {
+                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+            }
+        }
+
+        // Copy link
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href);
+            alert('Link copied to clipboard!');
+        }
+    </script>
+</body>
+</html>

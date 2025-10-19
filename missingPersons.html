@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find JA - View Missing Persons</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #E65C2A;
+            --secondary: #0C243C;
+            --white: #FFFFFF;
+            --gray-100: #F5F5F5;
+            --gray-200: #E0E0E0;
+            --gray-600: #757575;
+            --success: #28A745;
+            --danger: #DC3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--gray-100);
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+
+        /* Header (reuse from home) */
+        header {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: var(--white);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+        }
+
+        /* Filters Section */
+        .filters-section {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .filters-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+
+        .filter-group select, .filter-group input {
+            padding: 0.7rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .filter-group select:focus, .filter-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #d54d1e;
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--secondary);
+        }
+
+        /* View Toggle */
+        .view-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--white);
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .view-btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .view-btn.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .results-info {
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+
+        /* Grid View */
+        .cases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .case-card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--secondary);
+        }
+
+        .case-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(230, 92, 42, 0.3);
+        }
+
+        .case-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .case-content {
+            padding: 1.5rem;
+        }
+
+        .case-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .case-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            color: var(--gray-600);
+        }
+
+        .case-details span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-found {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-closed {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+
+        /* Map View */
+        #map {
+            height: 600px;
+            border-radius: 15px;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        #map.active {
+            display: block;
+        }
+
+        .map-popup {
+            text-align: center;
+        }
+
+        .map-popup img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+        }
+
+        .map-popup h4 {
+            margin-bottom: 0.5rem;
+        }
+
+        .map-popup .btn {
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.2rem;
+            color: var(--gray-600);
+        }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            background: var(--white);
+            border-radius: 15px;
+        }
+
+        .no-results h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer (reuse from home) */
+        footer {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .filters-row {
+                grid-template-columns: 1fr;
+            }
+
+            .cases-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .view-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .view-toggle {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Load Supabase SDK -->
+<script src="https://unpkg.com/@supabase/supabase-js"></script>
+
+<!-- Load your client file (Step 1) -->
+<script src="supabaseClient.js"></script>
+
+<!-- Your page-specific code goes here -->
+<script>
+  async function loadCases() {
+    const { data, error } = await supabaseClient.from('cases').select('*');
+    console.log(data, error);
+  }
+
+  loadCases();
+</script>
+
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                🔍 lo<span>CATE!</span>
+            </a>
+            
+             <nav>
+                <a href="home.html">Home</a>
+                <a href="missingPersons.html">View Missing</a>
+                <a href="report.html">Report</a>
+                <a href="search-parties.html">Search Parties</a>
+                <a href="about.html">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <h1 class="page-title">Missing Persons</h1>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="parishFilter">Parish</label>
+                    <select id="parishFilter">
+                        <option value="">All Parishes</option>
+                        <option value="Kingston">Kingston</option>
+                        <option value="St. Andrew">St. Andrew</option>
+                        <option value="St. Catherine">St. Catherine</option>
+                        <option value="Clarendon">Clarendon</option>
+                        <option value="Manchester">Manchester</option>
+                        <option value="St. Elizabeth">St. Elizabeth</option>
+                        <option value="Westmoreland">Westmoreland</option>
+                        <option value="Hanover">Hanover</option>
+                        <option value="St. James">St. James</option>
+                        <option value="Trelawny">Trelawny</option>
+                        <option value="St. Ann">St. Ann</option>
+                        <option value="St. Mary">St. Mary</option>
+                        <option value="Portland">Portland</option>
+                        <option value="St. Thomas">St. Thomas</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="statusFilter">Status</label>
+                    <select id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="Active" selected>Active</option>
+                        <option value="Found">Found</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="sortFilter">Sort By</label>
+                    <select id="sortFilter">
+                        <option value="recent">Most Recent</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="age-asc">Age (Low to High)</option>
+                        <option value="age-desc">Age (High to Low)</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="searchInput">Search</label>
+                    <input type="text" id="searchInput" placeholder="Name or keywords...">
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+                <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            </div>
+        </div>
+
+        <!-- View Controls -->
+        <div class="view-controls">
+            <div class="results-info">
+                Showing <span id="resultsCount">0</span> results
+            </div>
+
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="grid" onclick="switchView('grid')">
+                    📋 List View
+                </button>
+                <button class="view-btn" data-view="map" onclick="switchView('map')">
+                    🗺️ Map View
+                </button>
+            </div>
+        </div>
+
+        <!-- Grid View -->
+        <div id="gridView" class="cases-grid">
+            <!-- Dynamically loaded -->
+        </div>
+
+        <!-- Map View -->
+        <div id="map"></div>
+
+        <!-- Loading State -->
+        <div id="loading" class="loading" style="display: none;">
+            Loading cases...
+        </div>
+
+        <!-- No Results -->
+        <div id="noResults" class="no-results" style="display: none;">
+            <h3>No cases found</h3>
+            <p>Try adjusting your filters or search terms</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <p>&copy; 2025 loCATE!. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let map;
+        let markers = [];
+        let allCases = [];
+        let currentView = 'grid';
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            loadCases();
+            
+            // Check URL params
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('filter') === 'parish') {
+                // Pre-select parish filter if coming from home
+            }
+            if (params.get('q')) {
+                document.getElementById('searchInput').value = params.get('q');
+                applyFilters();
+            }
+        });
+
+        // Initialize Leaflet Map
+        function initMap() {
+            map = L.map('map').setView([18.1096, -77.2975], 9); // Jamaica center
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+        }
+
+        // Load cases from API
+        async function loadCases() {
+            document.getElementById('loading').style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/cases');
+                allCases = await response.json();
+                
+                document.getElementById('loading').style.display = 'none';
+                displayCases(allCases);
+            } catch (error) {
+                console.error('Error loading cases:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('noResults').style.display = 'block';
+            }
+        }
+
+        // Display cases in grid
+        function displayCases(cases) {
+            const gridView = document.getElementById('gridView');
+            const noResults = document.getElementById('noResults');
+            const resultsCount = document.getElementById('resultsCount');
+            
+            resultsCount.textContent = cases.length;
+            
+            if (cases.length === 0) {
+                gridView.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            gridView.innerHTML = cases.map(c => `
+                <a href="case-detail.html?id=${c.id}" class="case-card">
+                    <img src="${c.photo_url || 'https://via.placeholder.com/300x250?text=No+Photo'}" 
+                         alt="${c.full_name}" 
+                         class="case-image">
+                    <div class="case-content">
+                        <h3 class="case-name">${c.full_name}</h3>
+                        <div class="case-details">
+                            <span>👤 ${c.age} years old, ${c.gender}</span>
+                            <span>📍 ${c.parish}</span>
+                            <span>📅 Last seen: ${new Date(c.last_seen_date).toLocaleDateString()}</span>
+                        </div>
+                        <span class="status-badge status-${c.status.toLowerCase()}">${c.status}</span>
+                    </div>
+                </a>
+            `).join('');
+            
+            // Update map markers
+            updateMapMarkers(cases);
+        }
+
+        // Update map markers
+        function updateMapMarkers(cases) {
+            // Clear existing markers
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            
+            // Add new markers
+            cases.forEach(c => {
+                if (c.lat && c.lng) {
+                    const marker = L.marker([c.lat, c.lng])
+                        .addTo(map)
+                        .bindPopup(`
+                            <div class="map-popup">
+                                <img src="${c.photo_url || 'https://via.placeholder.com/150?text=No+Photo'}" alt="${c.full_name}">
+                                <h4>${c.full_name}</h4>
+                                <p>${c.age} years old</p>
+                                <p>${c.parish}</p>
+                                <a href="case-detail.html?id=${c.id}" class="btn btn-primary">View Details</a>
+                            </div>
+                        `);
+                    markers.push(marker);
+                }
+            });
+            
+            // Fit bounds if markers exist
+            if (markers.length > 0) {
+                const group = L.featureGroup(markers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const parish = document.getElementById('parishFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = allCases.filter(c => {
+                let match = true;
+                
+                if (parish && c.parish !== parish) match = false;
+                if (status && c.status !== status) match = false;
+                if (search && !c.full_name.toLowerCase().includes(search) && 
+                    !c.description.toLowerCase().includes(search)) match = false;
+                
+                return match;
+            });
+            
+            // Sort
+            filtered.sort((a, b) => {
+                switch(sort) {
+                    case 'recent':
+                        return new Date(b.created_at) - new Date(a.created_at);
+                    case 'oldest':
+                        return new Date(a.created_at) - new Date(b.created_at);
+                    case 'age-asc':
+                        return a.age - b.age;
+                    case 'age-desc':
+                        return b.age - a.age;
+                    default:
+                        return 0;
+                }
+            });
+            
+            displayCases(filtered);
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('parishFilter').value = '';
+            document.getElementById('statusFilter').value = 'Active';
+            document.getElementById('sortFilter').value = 'recent';
+            document.getElementById('searchInput').value = '';
+            
+            displayCases(allCases);
+        }
+
+        // Switch view
+        function switchView(view) {
+            currentView = view;
+            
+            const btns = document.querySelectorAll('.view-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+            
+            document.querySelector(`[data-view="${view}"]`).classList.add('active');
+            
+            if (view === 'grid') {
+                document.getElementById('gridView').style.display = 'grid';
+                document.getElementById('map').classList.remove('active');
+            } else {
+                document.getElementById('gridView').style.display = 'none';
+                document.getElementById('map').classList.add('active');
+                
+                // Refresh map
+                setTimeout(() => map.invalidateSize(), 100);
+            }
+        }
+
+        // Real-time search
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+    </script>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>loCATE! </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #E65C2A;
+            --secondary: #0C243C;
+            --white: #FFFFFF;
+            --gray-100: #F5F5F5;
+            --gray-200: #E0E0E0;
+            --gray-600: #757575;
+            --success: #28A745;
+            --danger: #DC3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--gray-100);
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: var(--white);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--primary);
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--secondary) 0%, #1a3a5c 100%);
+            color: var(--white);
+            padding: 4rem 2rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .content-section {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .content-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+
+        .content-section h3 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .content-section p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .content-section ul, .content-section ol {
+            margin: 1rem 0 1rem 2rem;
+        }
+
+        .content-section li {
+            margin-bottom: 0.8rem;
+            font-size: 1.05rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--gray-100);
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(230, 92, 42, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--secondary);
+        }
+
+        .guidelines {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .guidelines h4 {
+            color: #856404;
+            margin-bottom: 1rem;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .contact-card {
+            background: var(--gray-100);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .contact-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-card h4 {
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+
+        .contact-card a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .emergency-box {
+            background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
+            color: var(--white);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .emergency-box h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .emergency-numbers {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .emergency-numbers div {
+            background: rgba(255,255,255,0.2);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+        }
+
+        .emergency-numbers strong {
+            font-size: 1.5rem;
+            display: block;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #d54d1e;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 3rem;
+            background: linear-gradient(135deg, var(--primary) 0%, #ff7844 100%);
+            color: var(--white);
+            border-radius: 15px;
+            margin: 3rem 0;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            border: none;
+            padding: 0;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        footer {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+
+            .features-grid,
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .emergency-numbers {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Load Supabase SDK -->
+<script src="https://unpkg.com/@supabase/supabase-js"></script>
+
+<!-- Load your client file (Step 1) -->
+<script src="supabaseClient.js"></script>
+
+<!-- Your page-specific code goes here -->
+<script>
+  async function loadCases() {
+    const { data, error } = await supabaseClient.from('cases').select('*');
+    console.log(data, error);
+  }
+
+  loadCases();
+</script>
+
+
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">
+                🔍 lo<span>CATE! </span>
+            </a>
+            
+             <nav>
+                <a href="home.html">Home</a>
+                <a href="missingPersons.html">View Missing</a>
+                <a href="report.html">Report</a>
+                <a href="search-parties.html">Search Parties</a>
+                <a href="about.html">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="hero">
+            <h1>About loCATE! </h1>
+            <p>A community-driven platform dedicated to reuniting families and finding missing persons across Jamaica</p>
+        </div>
+
+        <!-- Mission Section -->
+        <div class="content-section">
+            <h2>Our Mission</h2>
+            <p>
+                loCATE! was created with a single purpose: to help bring missing persons home safely. We believe that by
+                harnessing the power of community and technology, we can make a real difference in the lives of families
+                experiencing the trauma of a missing loved one.
+            </p>
+            <p>
+                Every missing person report represents a family in crisis, a community concerned, and a life that matters.
+                Our platform provides the tools, visibility, and coordination needed to maximize the chances of a safe return.
+            </p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Centralized Database</h3>
+                    <p>All missing persons cases in one searchable location</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔔</div>
+                    <h3>Real-Time Alerts</h3>
+                    <p>Instant notifications when someone goes missing in your area</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤝</div>
+                    <h3>Community Support</h3>
+                    <p>Organize search parties and volunteer efforts</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💡</div>
+                    <h3>Anonymous Tips</h3>
+                    <p>Submit information safely and confidentially</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="content-section">
+            <h2>How It Works</h2>
+            
+            <h3>1. Report a Missing Person</h3>
+            <p>
+                Family members or concerned parties can submit a detailed missing person report including photos,
+                physical description, last known location, and other relevant information. Reports are reviewed by
+                our moderation team to ensure accuracy and prevent abuse.
+            </p>
+
+            <h3>2. Community Awareness</h3>
+            <p>
+                Once verified, the report is made visible to the public and alerts are sent to registered users in
+                the relevant parish and surrounding areas. The more people who know, the better the chances of finding
+                the missing person.
+            </p>
+
+            <h3>3. Gather Information</h3>
+            <p>
+                Community members can submit tips anonymously or with contact information. All tips are reviewed and
+                shared with the reporter and relevant authorities while maintaining confidentiality.
+            </p>
+
+            <h3>4. Coordinate Search Efforts</h3>
+            <p>
+                When there's enough community interest, search parties can be organized to conduct physical searches
+                of the area. Volunteers receive notifications and can coordinate their efforts through the platform.
+            </p>
+
+            <h3>5. Resolution & Support</h3>
+            <p>
+                When a person is found, the case is updated and all volunteers are notified. Even closed cases remain
+                in our database as a resource for future reference.
+            </p>
+        </div>
+
+        <!-- Guidelines -->
+        <div class="content-section" id="guidelines">
+            <h2>Reporting Guidelines</h2>
+            
+            <div class="guidelines">
+                <h4>⚠️ Important Guidelines to Prevent False Reports</h4>
+                <ul>
+                    <li>Only report someone as missing if they cannot be contacted through normal means</li>
+                    <li>Check with friends and family members before filing a report</li>
+                    <li>Adults have the right to leave - only report if you have genuine concern for their safety</li>
+                    <li>Provide accurate and truthful information only</li>
+                    <li>File a police report (119) for urgent situations</li>
+                    <li>Do not submit false or misleading reports - this is a serious offense</li>
+                </ul>
+            </div>
+
+            <h3>What Makes a Good Report?</h3>
+            <ol>
+                <li><strong>Recent, clear photo:</strong> The most important element for identification</li>
+                <li><strong>Specific details:</strong> Height, weight, distinguishing features, clothing</li>
+                <li><strong>Accurate location:</strong> Exact address or landmark of last known location</li>
+                <li><strong>Timeline:</strong> Specific date and time last seen</li>
+                <li><strong>Context:</strong> Circumstances of disappearance, if known</li>
+                <li><strong>Contact information:</strong> How people can reach you with tips</li>
+            </ol>
+
+            <h3>Safety Considerations</h3>
+            <ul>
+                <li>Never confront someone if you think you've spotted a missing person</li>
+                <li>Call the reporter or police with your information</li>
+                <li>Do not put yourself in danger during search efforts</li>
+                <li>Respect private property during searches</li>
+                <li>Work with local authorities and coordinate your efforts</li>
+            </ul>
+        </div>
+
+        <!-- Emergency Box -->
+        <div class="emergency-box">
+            <h3>🚨 Emergency Contacts</h3>
+            <p>In case of emergency, always contact the authorities first</p>
+            <div class="emergency-numbers">
+                <div>
+                    <strong>119</strong>
+                    <p>Police Emergency</p>
+                </div>
+                <div>
+                    <strong>311</strong>
+                    <p>Crime Stop</p>
+                </div>
+                <div>
+                    <strong>110</strong>
+                    <p>Fire/Ambulance</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="content-section" id="contact">
+            <h2>Contact Us</h2>
+            <p>Have questions, concerns, or feedback? We're here to help.</p>
+
+            <div class="contact-grid">
+                <div class="contact-card">
+                    <div class="contact-icon">📧</div>
+                    <h4>Email</h4>
+                    <a href="mailto:support@locate.com">support@locate.com</a>
+                </div>
+
+                <div
